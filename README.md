@@ -62,6 +62,22 @@ lib/
       └── viewmodels/
 ```
 
+## Ekran Görüntüleri
+
+![Screenshot_1](https://github.com/user-attachments/assets/b660a3de-0d67-4cad-b726-788596de8a3b)
+
+![Screenshot_2](https://github.com/user-attachments/assets/1f4e5427-cc14-4fbd-b132-c43a8ad6f2f0)
+
+![Screenshot_3](https://github.com/user-attachments/assets/8c5c7037-9c75-49ad-9bd2-5d454e165e8c)
+
+![Screenshot_4](https://github.com/user-attachments/assets/6e3389b9-96ab-459b-816d-620793b7f2da)
+
+
+![Screenshot_5](https://github.com/user-attachments/assets/cc2bf3f9-3119-461f-931a-360df497c311)
+![Screenshot_6](https://github.com/user-attachments/assets/6f14e278-3528-4c14-9f71-a9aed1e033cd)
+
+![Screenshot_7](https://github.com/user-attachments/assets/832542bb-ab85-46d4-aaf3-95f2892575ed)
+
 ## Teşekkürler
 
 - [Flutter](https://flutter.dev)
