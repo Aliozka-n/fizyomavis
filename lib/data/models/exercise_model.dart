@@ -6,7 +6,7 @@ class Exercise {
   final String description;
   final String category;
   final String imageUrl;
-  bool isSelected;
+  final bool isSelected;
 
   Exercise({
     required this.id,
@@ -17,27 +17,31 @@ class Exercise {
     this.isSelected = false,
   });
 
-  // JSON serialization
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'description': description,
-        'category': category,
-        'imageUrl': imageUrl,
-        'isSelected': isSelected,
-      };
+  // Map'ten Exercise oluştur
+  factory Exercise.fromMap(Map<String, dynamic> map) {
+    return Exercise(
+      id: map['id'],
+      title: map['title'],
+      description: map['description'],
+      category: map['category'],
+      imageUrl: map['imageUrl'],
+      isSelected: map['isSelected'] == 1,
+    );
+  }
 
-  // JSON deserialization
-  factory Exercise.fromJson(Map<String, dynamic> json) => Exercise(
-        id: json['id'],
-        title: json['title'],
-        description: json['description'],
-        category: json['category'],
-        imageUrl: json['imageUrl'],
-        isSelected: json['isSelected'] ?? false,
-      );
+  // Exercise'i Map'e çevir
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'title': title,
+      'description': description,
+      'category': category,
+      'imageUrl': imageUrl,
+      'isSelected': isSelected ? 1 : 0,
+    };
+  }
 
-  // Copy with method for immutability
+  // Kopyalama metodu
   Exercise copyWith({
     String? id,
     String? title,
@@ -54,5 +58,11 @@ class Exercise {
       imageUrl: imageUrl ?? this.imageUrl,
       isSelected: isSelected ?? this.isSelected,
     );
+  }
+
+  // toString metodu (debugging için)
+  @override
+  String toString() {
+    return 'Exercise(id: $id, title: $title, category: $category)';
   }
 }

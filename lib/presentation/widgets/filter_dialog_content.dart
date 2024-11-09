@@ -18,46 +18,31 @@ class FilterDialogContent extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Tüm egzersizler seçeneği
-            ListTile(
-              leading: Radio<String?>(
-                value: null,
-                groupValue: viewModel.selectedCategory,
-                onChanged: (value) {
-                  viewModel.filterByCategory(value);
-                  Navigator.pop(context);
-                },
-              ),
+            RadioListTile<String?>(
               title: Text('Tüm Egzersizler'),
-              onTap: () {
-                viewModel.filterByCategory(null);
+              value: null,
+              groupValue: viewModel.selectedCategory,
+              onChanged: (value) {
+                viewModel.filterByCategory(value);
                 Navigator.pop(context);
               },
             ),
 
             // Kategori listesi
-            ...AppConstants.categories.map(
-              (category) => ListTile(
-                leading: Radio<String?>(
-                  value: category,
-                  groupValue: viewModel.selectedCategory,
-                  onChanged: (value) {
-                    viewModel.filterByCategory(value);
-                    Navigator.pop(context);
-                  },
-                ),
+            ...AppConstants.categories.map((category) {
+              return RadioListTile<String>(
                 title: Text(category),
-                onTap: () {
-                  viewModel.filterByCategory(category);
+                value: category,
+                groupValue: viewModel.selectedCategory,
+                onChanged: (value) {
+                  viewModel.filterByCategory(value);
                   Navigator.pop(context);
                 },
-              ),
-            ),
+              );
+            }).toList(),
 
-            SizedBox(height: 16),
-
-            // Alt butonlar
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [

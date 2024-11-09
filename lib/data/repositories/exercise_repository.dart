@@ -6,7 +6,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../models/exercise_model.dart';
+import '../models/exercise_model.dart'; // Bu satır düzeltildi
 
 class ExerciseRepository {
   static Database? _database;
@@ -18,99 +18,95 @@ class ExerciseRepository {
   }
 
   Future<Database> _initDatabase() async {
-    final documentsDirectory = await getApplicationDocumentsDirectory();
-    final path = join(documentsDirectory.path, 'exercises.db');
+    Directory documentsDirectory = await getApplicationDocumentsDirectory();
+    String path = join(documentsDirectory.path, 'exercises.db');
 
     return await openDatabase(
       path,
       version: 1,
-      onCreate: (db, version) async {
+      onCreate: (Database db, int version) async {
         await db.execute('''
-          CREATE TABLE exercises(
+          CREATE TABLE exercises (
             id TEXT PRIMARY KEY,
-            title TEXT,
-            description TEXT,
-            category TEXT,
-            imageUrl TEXT,
-            isSelected INTEGER DEFAULT 0
+            title TEXT NOT NULL,
+            description TEXT NOT NULL,
+            category TEXT NOT NULL,
+            imageUrl TEXT NOT NULL,
+            isSelected INTEGER NOT NULL DEFAULT 0
           )
         ''');
       },
     );
   }
 
-  Future<List<Exercise>> getExercises() async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query('exercises');
-
-    return List.generate(maps.length, (i) {
-      final data = maps[i];
-      return Exercise(
-        id: data['id'],
-        title: data['title'],
-        description: data['description'],
-        category: data['category'],
-        imageUrl: data['imageUrl'],
-        isSelected: data['isSelected'] == 1,
-      );
-    });
-  }
-
-  Future<void> addExercise(Exercise exercise) async {
-    final db = await database;
-    await db.insert(
-      'exercises',
-      {
-        'id': exercise.id,
-        'title': exercise.title,
-        'description': exercise.description,
-        'category': exercise.category,
-        'imageUrl': exercise.imageUrl,
-        'isSelected': exercise.isSelected ? 1 : 0,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  Future<void> updateExercise(Exercise exercise) async {
-    final db = await database;
-    await db.update(
-      'exercises',
-      {
-        'title': exercise.title,
-        'description': exercise.description,
-        'category': exercise.category,
-        'imageUrl': exercise.imageUrl,
-        'isSelected': exercise.isSelected ? 1 : 0,
-      },
-      where: 'id = ?',
-      whereArgs: [exercise.id],
-    );
-  }
-
-  Future<void> deleteExercise(String id) async {
-    final db = await database;
-    await db.delete(
-      'exercises',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
+  // Resmi kaydet
   Future<String> saveImage(File image) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final imagesDir = Directory(join(directory.path, 'exercise_images'));
+    try {
+      final Directory appDir = await getApplicationDocumentsDirectory();
+      final String imagesPath = join(appDir.path, 'exercise_images');
 
-    // Klasörü oluştur
-    if (!await imagesDir.exists()) {
-      await imagesDir.create(recursive: true);
+      // Klasör yoksa oluştur
+      final imagesDir = Directory(imagesPath);
+      if (!await imagesDir.exists()) {
+        await imagesDir.create(recursive: true);
+      }
+
+      // Benzersiz dosya adı oluştur
+      final String fileName = 'exercise_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final String filePath = join(imagesPath, fileName);
+
+      // Resmi kopyala
+      await image.copy(filePath);
+
+      return filePath;
+    } catch (e) {
+      print('Resim kaydedilirken hata: $e');
+      throw Exception('Resim kaydedilirken bir hata oluştu');
     }
+  }
 
-    final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-    final imagePath = join(imagesDir.path, fileName);
+  // Egzersiz ekle
+  Future<void> addExercise(Exercise exercise) async {
+    try {
+      final db = await database;
+      await db.insert(
+        'exercises',
+        exercise.toMap(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    } catch (e) {
+      print('Egzersiz eklenirken hata: $e');
+      throw Exception('Egzersiz veritabanına eklenirken bir hata oluştu');
+    }
+  }
 
-    // Resmi kopyala
-    await image.copy(imagePath);
-    return imagePath;
+  // Tüm egzersizleri getir
+  Future<List<Exercise>> getExercises() async {
+    try {
+      final db = await database;
+      final List<Map<String, dynamic>> maps = await db.query('exercises');
+
+      return List.generate(maps.length, (i) {
+        return Exercise.fromMap(maps[i]);
+      });
+    } catch (e) {
+      print('Egzersizler getirilirken hata: $e');
+      throw Exception('Egzersizler veritabanından getirilirken bir hata oluştu');
+    }
+  }
+
+  // Egzersiz sil
+  Future<void> deleteExercise(String id) async {
+    try {
+      final db = await database;
+      await db.delete(
+        'exercises',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } catch (e) {
+      print('Egzersiz silinirken hata: $e');
+      throw Exception('Egzersiz veritabanından silinirken bir hata oluştu');
+    }
   }
 }

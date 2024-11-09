@@ -3,22 +3,27 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'core/theme/app_theme.dart';
 import 'data/repositories/exercise_repository.dart';
+import 'data/repositories/program_repository.dart';
+import 'presentation/screens/home_screen.dart';
 import 'presentation/viewmodels/exercise_viewmodel.dart';
-import 'presentation/views/home_screen.dart';
+import 'presentation/viewmodels/program_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Repository instance'ını oluştur
-  final repository = ExerciseRepository();
+  // Repository'leri oluştur
+  final exerciseRepository = ExerciseRepository();
+  final programRepository = ProgramRepository();
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => ExerciseViewModel(repository),
+          create: (context) => ExerciseViewModel(exerciseRepository),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ProgramViewModel(programRepository),
         ),
       ],
       child: MyApp(),
@@ -31,18 +36,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Fizyoterapi Takip',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system, // Sistem temasını kullan
-      home: const HomeScreen(),
-      debugShowCheckedModeBanner: false,
-      builder: (context, child) {
-        // Tüm metinler için varsayılan stil
-        return MediaQuery(
-          data: MediaQuery.of(context).copyWith(),
-          child: child!,
-        );
-      },
+      theme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+        ),
+      ),
+      home: HomeScreen(),
     );
   }
 }
